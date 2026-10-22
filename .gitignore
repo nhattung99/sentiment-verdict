@@ -1,0 +1,11 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+artifacts/
+.env
+.env.*
+*.pem
+*.key
+_debug_sources.txt
