@@ -143,7 +143,48 @@ python -m venv .venv
 gltest tests/
 ```
 
-## Contract address
+## Deployment
 
-- **Contract address:** `0x...TBD after deploy`
-- **Network:** studionet
+- **CONTRACT_ADDRESS:** `0x542C3ee7854100c60D0faBdE82549C335Ce13DD0`
+- **NETWORK:** studionet
+- **Explorer:** https://explorer-studio.genlayer.com/address/0x542C3ee7854100c60D0faBdE82549C335Ce13DD0
+
+### Real on-chain read
+
+A read-only call against this address on studionet returned:
+
+- `get_count()` -> `0`
+- `get_latest("Ethereum ETH")` -> `{"found": false}`
+- `list_reports("")` -> `[]`
+
+No sentiment reading is stored on studionet yet. The worked example below is the expected result from the local test `test_bullish_sentiment`, not a receipt from this address.
+
+### Worked example (expected output, not a live studionet verdict)
+
+Input to `submit_reading`:
+
+```text
+asset_name:   Ethereum ETH
+context_note: Post-ETF approval week
+source_urls:
+  https://coingecko.com/en/coins/ethereum
+  https://reddit.com/r/ethereum/top
+  https://cointelegraph.com/tags/ethereum
+```
+
+The CoinGecko page shows a 78% community bullish rating, the Reddit thread is optimistic about upgrades, and the Cointelegraph page reports institutional inflows. Expected `get_sentiment` after `score_sentiment`:
+
+```json
+{
+  "report_id": "1",
+  "asset_name": "Ethereum ETH",
+  "tier": "BULLISH",
+  "sentiment_score": 55,
+  "confidence": 85,
+  "sources_read": 3,
+  "reasoning": "All three sources show strong bullish signals with institutional inflows and community optimism.",
+  "source_breakdown": "[{\"url\": \"https://coingecko.com/en/coins/ethereum\", \"score\": 60, \"sentiment\": \"BULLISH\", \"signal\": \"78% community bullish rating\"}, {\"url\": \"https://reddit.com/r/ethereum/top\", \"score\": 65, \"sentiment\": \"BULLISH\", \"signal\": \"Top posts all optimistic, high upvotes\"}, {\"url\": \"https://cointelegraph.com/tags/ethereum\", \"score\": 40, \"sentiment\": \"BULLISH\", \"signal\": \"Analysts positive, institutional inflows\"}]"
+}
+```
+
+`sentiment_score` 55 is the signed score. It is stored as `bigint(155)` (`55 + 100`). Status on `get_report` is `SCORED`.
